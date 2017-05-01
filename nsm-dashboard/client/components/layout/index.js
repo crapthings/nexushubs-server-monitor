@@ -1,9 +1,12 @@
 import System from '/collections/system'
 
+import Servers from '/collections/servers'
+
 import prettyBytes from 'pretty-bytes'
 
 const tracker = (props, onData) => {
-  const ready = Meteor.subscribe('system').ready()
+
+  const ready = Meteor.subscribe('servers').ready()
   if (ready) {
     const system = System.findOne({ isCore: true })
     const cpu = _.get(system, 'stat.cpu', 0)
@@ -16,13 +19,16 @@ const tracker = (props, onData) => {
 
     const now = moment()
 
-    onData(null, { system, cpu, memory, freemem, node, meteor, updatedAt, updatedAtStr })
+    const servers = Servers.find().fetch()
+
+    onData(null, { servers, system, cpu, memory, freemem, node, meteor, updatedAt, updatedAtStr })
   } else {
-    onData(null, {})
+    onData(null, null)
   }
+
 }
 
-const component = ({ system, cpu = 0, memory = 0, freemem = 0, node, meteor, updatedAt, updatedAtStr }) => <div>
+const component = ({ servers, system, cpu = 0, memory = 0, freemem = 0, node, meteor, updatedAt, updatedAtStr }) => <div>
   <table>
     <thead>
       <tr>
@@ -41,6 +47,13 @@ const component = ({ system, cpu = 0, memory = 0, freemem = 0, node, meteor, upd
         <td>{node}</td>
         <td>{meteor}</td>
       </tr>
+      {servers.map(server => <tr key={server._id}>
+        <td></td>
+        <td>{_.get(server, 'stat.cpu')}</td>
+        <td>{_.get(server, 'stat.memory')}</td>
+        <td>{_.get(server, 'stat.node')}</td>
+        <td>{_.get(server, 'stat.meteor')}</td>
+      </tr>)}
     </tbody>
   </table>
 </div>
