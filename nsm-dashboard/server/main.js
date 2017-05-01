@@ -1,17 +1,21 @@
 import pusage from 'pidusage'
 
-pusage.stat(process.pid, function(err, stat) {
+import System from '/collections/system'
 
-  console.log(stat)
-  console.log('Pcpu: %s', stat.cpu)
-  console.log('Mem: %s', stat.memory) //those are bytes
+Meteor.startup(waitToPollStats)
 
-})
+function waitToPollStats() {
+  Meteor.setTimeout(pollStats, 10 * 1000)
+}
 
-setInterval(function () {
-  pusage.stat(process.pid, function(err, stat) {
-    console.log(stat)
-    console.log('Pcpu: %s', stat.cpu)
-    console.log('Mem: %s', stat.memory) //those are bytes
-  })
-}, 5000)
+function pollStats() {
+  Meteor.setInterval(getStats, 1 * 1000)
+}
+
+function getStats() {
+  pusage.stat(process.pid, Meteor.bindEnvironment(function(err, stat) {
+    System.update({ isCore: true }, {
+      $set: { stat }
+    })
+  }))
+}

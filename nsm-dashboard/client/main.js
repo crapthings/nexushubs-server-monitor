@@ -1,7 +1,9 @@
 import { render } from 'react-dom'
 
+import Layout from './components/layout'
+
 Meteor.startup(function () {
 
-  render(<h1>hello</h1>, document.getElementById('app'))
+  render(<Layout />, document.getElementById('app'))
 
 })
