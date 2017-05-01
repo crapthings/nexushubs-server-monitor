@@ -15,7 +15,7 @@ if (Meteor.isServer) {
   Meteor.startup(function () {
 
     System.upsert({ isCore: true }, {
-      $set: { isCore: true }
+      $set: { isCore: true, stat: {}, updatedAt: new Date(), }
     })
 
   })

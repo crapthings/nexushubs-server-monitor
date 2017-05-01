@@ -1,3 +1,5 @@
+import os from 'os'
+
 import pusage from 'pidusage'
 
 import System from '/collections/system'
@@ -15,7 +17,15 @@ function pollStats() {
 function getStats() {
   pusage.stat(process.pid, Meteor.bindEnvironment(function(err, stat) {
     System.update({ isCore: true }, {
-      $set: { stat }
+      $set: {
+        stat: {
+          ...stat,
+          freemem: os.freemem(),
+          node: process.version,
+          meteor: Meteor.release,
+        },
+        updatedAt: new Date(),
+      }
     })
   }))
 }
